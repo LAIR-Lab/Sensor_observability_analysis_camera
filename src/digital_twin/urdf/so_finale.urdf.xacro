@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="digital_twin">
+
+  <xacro:include filename="$(find digital_twin)/urdf/ros_control.urdf.xacro" />
+  <xacro:property name="focal_length" value="1.047" />
+
+  <link name="world"/>
+
+  <xacro:include filename="$(find digital_twin)/urdf/random_sphere_1.urdf.xacro" />
+
+  <link name="base_link">
+    <inertial>
+      <origin
+        xyz="0.0289665748459923 -0.0563386381862514 0.0257898952415849"
+        rpy="0 0 0" />
+      <mass
+        value="0.182638453025953" />
+      <inertia
+        ixx="0.000138502730797721"
+        ixy="5.13155858445536E-07"
+        ixz="-2.43327941158306E-09"
+        iyy="0.000149708916054179"
+        iyz="-2.12768663741834E-05"
+        izz="0.00017574420518952" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/base.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/base.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="rotator">
+    <inertial>
+      <origin
+        xyz="0.030196 0.05726 -0.0076233"
+        rpy="0 0 0" />
+      <mass
+        value="0.11834" />
+      <inertia
+        ixx="5.8117E-05"
+        ixy="-4.4778E-06"
+        ixz="5.0777E-07"
+        iyy="3.2325E-05"
+        iyz="7.7073E-07"
+        izz="5.9598E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/rotator.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/rotator.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_0"
+    type="revolute">
+    <origin
+      xyz="0.029071 -0.083383 0.015488"
+      rpy="1.5708 0 -1.7156" />
+    <parent
+      link="base_link" />
+    <child
+      link="rotator" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.243"
+      upper="1.827"
+      effort="10"
+      velocity="10" />
+    <dynamics damping="5.0" friction="1.0"/>
+  </joint>
+  <link
+    name="under_arm">
+    <inertial>
+      <origin
+        xyz="0.0725714453367885 -0.00247226941528854 -0.01757972470484"
+        rpy="0 0 0" />
+      <mass
+        value="0.161381394011792" />
+      <inertia
+        ixx="7.02120145779093E-05"
+        ixy="-1.95289891929553E-06"
+        ixz="1.99351680099217E-05"
+        iyy="0.000195698407340443"
+        iyz="5.94149495075594E-07"
+        izz="0.000148087906093691" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/under_arm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/under_arm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_1"
+    type="revolute">
+    <origin
+      xyz="0.029629 0.10044 -0.007646"
+      rpy="0.24808 -0.18094 1.258" />
+    <parent
+      link="rotator" />
+    <child
+      link="under_arm" />
+    <axis
+      xyz="0.24987 0 0.96828" />
+    <limit
+      lower="-1.418"
+      upper="2.08"
+      effort="10"
+      velocity="10" />
+    <dynamics damping="5.0" friction="1.0"/>
+  </joint>
+  <link
+    name="camera_1">
+    <inertial>
+      <origin
+        xyz="-0.014807 2.7562E-05 -0.00029683"
+        rpy="0 0 0" />
+      <mass
+        value="5.4945E-06" />
+      <inertia
+        ixx="5.7915E-10"
+        ixy="1.3338E-13"
+        ixz="2.1746E-13"
+        iyy="3.3324E-10"
+        iyz="-8.499E-13"
+        izz="3.3686E-10" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/camera_1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/camera_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fixed_camera_1"
+    type="fixed">
+    <origin
+      xyz="0.12006 -0.0058453 0.020345"
+      rpy="-0.25255 0 -1.5708" />
+    <parent
+      link="under_arm" />
+    <child
+      link="camera_1" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="upper_arm">
+    <inertial>
+      <origin
+        xyz="0.076621 0.0021483 -0.018362"
+        rpy="0 0 0" />
+      <mass
+        value="0.14968" />
+      <inertia
+        ixx="5.765E-05"
+        ixy="1.6107E-06"
+        ixz="1.2433E-05"
+        iyy="0.00013933"
+        iyz="-4.0154E-07"
+        izz="9.8735E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/upper_arm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/upper_arm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_2"
+    type="revolute">
+    <origin
+      xyz="0.109 -0.028 -0.028128"
+      rpy="-0.2406 -0.16097 -1.1768" />
+    <parent
+      link="under_arm" />
+    <child
+      link="upper_arm" />
+    <axis
+      xyz="0.24987 0 0.96828" />
+    <limit
+      lower="-1.927"
+      upper="1.147"
+      effort="10"
+      velocity="10" />
+    <dynamics damping="5.0" friction="1.0"/>
+  </joint>
+  <link
+    name="camera_2">
+    <inertial>
+      <origin
+        xyz="-0.014807 0.00029683 2.7563E-05"
+        rpy="0 0 0" />
+      <mass
+        value="5.4945E-06" />
+      <inertia
+        ixx="5.7915E-10"
+        ixy="-2.1746E-13"
+        ixz="1.3339E-13"
+        iyy="3.3686E-10"
+        iyz="8.499E-13"
+        izz="3.3324E-10" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/camera_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/camera_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fixed_camera_2"
+    type="fixed">
+    <origin
+      xyz="0.11427 0.0027547 0.023802"
+      rpy="-0.25255 0 -1.5708" />
+    <parent
+      link="upper_arm" />
+    <child
+      link="camera_2" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="EE_rotator">
+    <inertial>
+      <origin
+        xyz="0.032137 -0.0028891 -0.016038"
+        rpy="0 0 0" />
+      <mass
+        value="0.068528" />
+      <inertia
+        ixx="2.4982E-05"
+        ixy="6.4371E-07"
+        ixz="3.1762E-07"
+        iyy="3.3722E-05"
+        iyz="-3.1393E-07"
+        izz="1.8312E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/EE_rotator.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/EE_rotator.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_3"
+    type="revolute">
+    <origin
+      xyz="0.13062 0.0052 -0.033708"
+      rpy="-0.077908 -0.012035 -0.30637" />
+    <parent
+      link="upper_arm" />
+    <child
+      link="EE_rotator" />
+    <axis
+      xyz="0.24987 0 0.96828" />
+    <limit
+      lower="-1.168"
+      upper="2"
+      effort="10"
+      velocity="10" />
+    <dynamics damping="5.0" friction="1.0"/>
+  </joint>
+  <link
+    name="EE">
+    <inertial>
+      <origin
+        xyz="0.046674 -0.0032136 0.040821"
+        rpy="0 0 0" />
+      <mass
+        value="0.096482" />
+      <inertia
+        ixx="4.1163E-05"
+        ixy="1.244E-06"
+        ixz="-8.1312E-06"
+        iyy="5.0998E-05"
+        iyz="-7.485E-07"
+        izz="3.2241E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/EE.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/EE.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_4"
+    type="revolute">
+    <origin
+      xyz="0.025128 -0.0022682 -0.0063813"
+      rpy="-0.12297 0.85988 -0.072346" />
+    <parent
+      link="EE_rotator" />
+    <child
+      link="EE" />
+    <axis
+      xyz="0.82051 -0.087161 0.56495" />
+    <limit
+      lower="-2.0"
+      upper="2.4"
+      effort="10"
+      velocity="10" />
+    <dynamics damping="5.0" friction="1.0"/>
+  </joint>
+  <link
+    name="camera_3">
+    <inertial>
+      <origin
+        xyz="-0.014807 -0.00029684 -2.7564E-05"
+        rpy="0 0 0" />
+      <mass
+        value="5.4945E-06" />
+      <inertia
+        ixx="5.7915E-10"
+        ixy="2.1744E-13"
+        ixz="-1.3339E-13"
+        iyy="3.3686E-10"
+        iyz="8.4993E-13"
+        izz="3.3324E-10" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/camera_3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/camera_3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fixed_camera_3"
+    type="fixed">
+    <origin
+      xyz="0.022265 0.021474 0.078641"
+      rpy="0.60199 -0.068773 -1.7238" />
+    <parent
+      link="EE" />
+    <child
+      link="camera_3" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="moving_leg">
+    <inertial>
+      <origin
+        xyz="-0.0015742 -0.030012 0.00047621"
+        rpy="0 0 0" />
+      <mass
+        value="0.020687" />
+      <inertia
+        ixx="1.1396E-05"
+        ixy="-5.5103E-07"
+        ixz="-1.0164E-08"
+        iyy="3.2597E-06"
+        iyz="-1.8887E-07"
+        izz="9.1077E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/moving_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.96471 0.96471 0.95294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://digital_twin/meshes_2/moving_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_5"
+    type="revolute">
+    <origin
+      xyz="0.05911 -0.007971 0.016426"
+      rpy="-1.696 0.98819 -0.25774" />
+    <parent
+      link="EE" />
+    <child
+      link="moving_leg" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.178"
+      upper="1.555"
+      effort="10"
+      velocity="10" />
+    <dynamics damping="5.0" friction="1.0"/>
+  </joint>
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="camera_1_optical"/>
+  <link name="camera_2_optical"/>
+  <link name="camera_3_optical"/>
+
+  <joint name="optics1" type="fixed">
+  <parent link="camera_1"/>
+  <child link="camera_1_optical"/>
+  <origin xyz="0 0 0" rpy="0 0 0" />
+</joint>
+
+<joint name="optics2" type="fixed">
+  <parent link="camera_2"/>
+  <child link="camera_2_optical"/>
+  <origin xyz="0 0 0" rpy="0 0 0" />
+</joint>
+
+<joint name="optics3" type="fixed">
+  <parent link="camera_3"/>
+  <child link="camera_3_optical"/>
+  <origin xyz="0 0 0" rpy="0 0 0" />
+</joint>
+  
+  <gazebo>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+  </gazebo>
+
+
+  <gazebo reference="camera_1">
+    <sensor name="cube_camera" type="camera">
+      <update_rate>10</update_rate>
+      <pose>0 0 0 0 0 0</pose> <!-- Front facing, near top edge -->
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <topic>/camera1/image_raw</topic>
+      <camera_info_topic>camera1/camera_info</camera_info_topic>
+      <camera name="main_cam">
+        <horizontal_fov>${focal_length}</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.01</near>
+          <far>100.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+
+  <gazebo reference="camera_2">
+    <sensor name="cube_camera_two" type="camera">
+      <update_rate>10</update_rate>
+      <pose>0 0 0 0 0 0</pose> <!-- Front facing, near top edge -->
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <topic>/camera2/image_raw</topic>
+      <camera_info_topic>camera2/camera_info</camera_info_topic>
+      <camera name="main_cam_two">
+        <horizontal_fov>${focal_length}</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.01</near>
+          <far>100.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+
+  <gazebo reference="camera_3">
+    <sensor name="cube_camera_three" type="camera">
+      <update_rate>10</update_rate>
+      <pose>0 0 0 0 0 0</pose> <!-- Front facing, near top edge -->
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <topic>/camera3/image_raw</topic>
+      <camera_info_topic>camera3/camera_info</camera_info_topic>
+      <camera name="main_cam_three">
+        <horizontal_fov>${focal_length}</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.01</near>
+          <far>100.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  
+  <gazebo>
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find digital_twin)/config/ros2_config.yaml</parameters>
+      <ros>
+        <remapping>/controller_manager/robot_description:=/robot_description</remapping>
+      </ros>
+    </plugin>
+  </gazebo>
+
+</robot>

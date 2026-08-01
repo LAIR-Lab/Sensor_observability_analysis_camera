@@ -1,0 +1,34 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    orbit_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+arm_controller:
+  ros__parameters:
+    joints:
+      - joint_0
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+
+orbit_controller:
+  ros__parameters:
+    joints:
+      - orbit_pivot_to_red_sphere
+      

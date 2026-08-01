@@ -1,0 +1,39 @@
+# ROS 2 build stuff
+build/
+build_*/
+install/
+log/
+
+#Vs Code
+*.vscode/
+# Python
+__pycache__/
+*.py[cod]
+
+# ROS bag files
+*.bag
+*.db3
+*.mcap
+
+# Logs
+*.log
+
+# Graphviz
+*.gv
+
+# Plots
+*.png
+
+#ros bag folders
+rosbag2_*/
+
+#csv logs
+*.csv
+
+#Research papers/ generated PDFs
+*.pdf
+
+#customs bash files for tests
+*.bash
+
+*.sdf

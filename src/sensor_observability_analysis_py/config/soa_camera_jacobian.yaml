@@ -1,0 +1,14 @@
+soa_camera_jacobian_node:
+  ros__parameters:
+
+    robot_urdf: "/home/arya-pangging/SOA/src/so101_description/urdf/so101.urdf"
+
+    world_frame: "world"
+
+    camera_frame: "camera_1"
+
+    poi_frame: "red_sphere"
+
+    obstacle_frame: "black_sphere"
+
+    update_rate: 20.0

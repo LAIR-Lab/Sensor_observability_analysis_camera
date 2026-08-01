@@ -1,0 +1,9 @@
+controller_manager:
+  ros__parameters:
+    orbit_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+orbit_controller:
+  ros__parameters:
+    joints:
+      - orbit_pivot_to_red_sphere
