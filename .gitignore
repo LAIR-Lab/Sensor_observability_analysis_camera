@@ -1,4 +1,4 @@
-# ROS 2 build artifacts
+# ROS 2 build stuff
 build/
 install/
 log/
@@ -11,3 +11,16 @@ __pycache__/
 *.bag
 *.db3
 *.mcap
+
+# Logs
+*.log
+
+# Graphviz
+*.gv
+
+# PDFs
+frames_*.pdf
+frames_*.gv
+
+# Plots
+*.png
