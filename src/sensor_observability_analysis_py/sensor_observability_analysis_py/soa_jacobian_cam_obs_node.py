@@ -1,7 +1,8 @@
 import numpy as np
 import roboticstoolbox as rtb
 from std_msgs.msg import Float64MultiArray, Float64
-
+import os
+from ament_index_python.packages import get_package_share_directory
 import rclpy
 from rclpy.node import Node
 
@@ -9,6 +10,11 @@ from sensor_msgs.msg import JointState
 
 from tf2_ros import Buffer, TransformListener, TransformException
 
+urdf_path = os.path.join(
+    get_package_share_directory("digital_twin"),
+    "urdf",
+    "so_finale.urdf.xacro"
+)
 
 JOINT_ORDER = [
     "joint_0",
@@ -19,16 +25,7 @@ JOINT_ORDER = [
     "joint_5"
 ]
 
-# Approximate physical radius of black_sphere (matches its collision
-# geometry in random_sphere.urdf.xacro), used to compute the obstacle's
-# own apparent angular size (FOV_obs) as seen from the camera. Assumed
-# the same for every obstacle frame below.
 BLACK_SPHERE_RADIUS = 0.09
-
-# TF frame names of every occluding obstacle to sum lambda_i over
-# (whiteboard: S_obs = sum_i lambda_i). Add more frame names here as
-# more obstacles are added to the TF tree -- each one just needs to
-# exist as a frame for its lambda_i/Jlam_i to be included automatically.
 OBSTACLE_FRAMES = [
     "black_sphere",
 ]
@@ -40,7 +37,7 @@ class SOACameraJacobian(Node):
         super().__init__("soa_camera_jacobian")
 
         self.robot = rtb.ERobot.URDF(
-            "/home/arya-pangging/SOA/src/digital_twin/urdf/so_finale.urdf.xacro"
+            urdf_path
         )
 
 
@@ -122,21 +119,6 @@ class SOACameraJacobian(Node):
 
     def _obstacle_term(self, Pc, a, rhat, d, Jc, Pobs):
 
-        # Single-obstacle contribution to (lambda_obs, Jlam, theta_cam_obs).
-        #
-        # lambda_i is now a BINARY flag, not a graded falloff:
-        #   lambda_i = 1  if this obstacle is nearer to the camera than
-        #                 the POI is (so it's in front of / can occlude it)
-        #              0  otherwise
-        #
-        # A step function's derivative is 0 almost everywhere (undefined
-        # only exactly at d_obs == d), so Jlam is always zero -- lambda_i
-        # contributes to the score but not to the Jacobian.
-        #
-        # Also returns theta_cam_obs: angle between the camera's optical
-        # axis and the direction to THIS obstacle (analogous to 'theta'
-        # for the POI) -- purely informational, not part of lambda_i.
-
         lam = 0.0
         Jlam = np.zeros(Jc.shape[1])
         theta_cam_obs = None
@@ -217,20 +199,7 @@ class SOACameraJacobian(Node):
         theta = np.arccos(c)
 
         S_target_raw = 1.0 - theta / self.fov
-
-        # dtheta_dp / dtheta_dw both divide by sqrt(1 - c^2), which goes
-        # to zero at BOTH poles: c=+1 (theta=0, camera pointed exactly
-        # at the target) AND c=-1 (theta=180, pointed exactly AWAY from
-        # it). Near either pole this blows the derivative magnitude up
-        # arbitrarily -- since the controller picks the joint with the
-        # largest |J_SOA|, this made theta=180 look just as "attractive"
-        # as theta=0, purely from this numerical artifact.
-        #
-        # S only depends on theta up to self.fov (~60deg) anyway, so
-        # exact derivative precision within a couple degrees of either
-        # pole isn't needed. Bound the value used in the denominator
-        # (NOT theta/S above, which stay exact) away from both poles.
-        c_safe = np.clip(c, -0.9994, 0.9994)  # keeps ~2 deg clear of either pole
+        c_safe = np.clip(c, -0.9994, 0.9994) 
         denom = np.sqrt(max(1e-12, 1.0 - c_safe * c_safe))
 
         I = np.eye(3)
@@ -257,9 +226,6 @@ class SOACameraJacobian(Node):
 
         Jsoa_target = dS_dxc @ Jc
 
-        # ---- Obstacle penalty terms, summed over every obstacle, ----
-        # ---- per whiteboard: S_hat = max(0, T_uni(theta,POI) - sum_i lambda_i) ----
-
         lam_total = 0.0
         Jlam_total = np.zeros(Jc.shape[1])
         angles_obs = []
@@ -274,8 +240,6 @@ class SOACameraJacobian(Node):
             Jlam_total += Jlam_i
             angles_obs.append(theta_cam_obs_i)
 
-        # ---- Final assembly ----
-        # (No outer max(0, ...) clamp -- S stays fully unclamped.)
         S = S_target_raw - lam_total
 
         Jsoa = Jsoa_target - Jlam_total
@@ -316,11 +280,6 @@ class SOACameraJacobian(Node):
             tf.transform.translation.z
         ])
 
-        # Obstacle positions are OPTIONAL, per-frame -- if a given frame
-        # isn't in the TF tree yet (e.g. its link/joint is still
-        # commented out in random_sphere.urdf.xacro, or it just hasn't
-        # been spawned), skip that one obstacle rather than treating it
-        # as an error. Missing frames simply don't contribute a lambda_i.
         Pobs_list = []
 
         for frame in OBSTACLE_FRAMES:
@@ -340,10 +299,9 @@ class SOACameraJacobian(Node):
                 ]))
 
             except TransformException:
-                pass  # this obstacle not in the tree -- its lambda_i just stays 0
+                pass
 
         try:
-
             result = self.compute_soa(
                 self.q,
                 Ppoi,

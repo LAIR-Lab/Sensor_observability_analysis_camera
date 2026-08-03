@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import numpy as np
 
 import rclpy
@@ -23,8 +21,6 @@ ACTIVE_JOINTS = [
     "joint_4"
 ]
 
-# Full joint set the trajectory controller expects. joint_5 isn't part of
-# the camera chain, so it's just held at its last known position.
 CONTROLLER_JOINTS = [
     "joint_0",
     "joint_1",
@@ -34,21 +30,11 @@ CONTROLLER_JOINTS = [
     "joint_5"
 ]
 
-# Real joint limits from so_finale.urdf.xacro (radians).
+
 JOINT_LOWER_LIMITS = np.array([-2.243, -1.418, -1.927, -1.168, -2.0])
 JOINT_UPPER_LIMITS = np.array([1.827, 2.08, 1.147, 2.0, 2.4])
-
-# How close to a limit (radians) counts as "at" it for selection purposes.
 JOINT_LIMIT_MARGIN = np.deg2rad(1.0)
-
-# How much of the commanded move has to be "missing" after a goal
-# completes for that direction to be treated as physically blocked
-# (surface/self-collision, not a URDF limit). 0.5 = joint ended up less
-# than half way to where it was told to go.
 PHYSICAL_BLOCK_FRACTION = 0.5
-
-# Minimum commanded delta (rad) worth checking for a physical block --
-# below this, normal settle/measurement noise could look like a stall.
 PHYSICAL_BLOCK_MIN_DELTA = np.deg2rad(0.5)
 
 
@@ -58,15 +44,13 @@ class SOAGradientAscent(Node):
 
         super().__init__("soa_gradient_ascent")
 
-        ############################################
         # Parameters
-        ############################################
 
         self.step = np.deg2rad(1.0)
         self.base_step = self.step          # ceiling the step can regrow to
         self.min_step = np.deg2rad(0.1)
         self.step_shrink = 0.5
-        self.step_grow = 1.35               # was 1.2 -- recover from a shrink faster
+        self.step_grow = 1.35               # was 1.2 -- faster now
 
         self.improvement_tol = 1e-4
         self.stall_patience = 8
@@ -148,8 +132,6 @@ class SOAGradientAscent(Node):
             self.optimize
         )
 
-    ################################################
-
     def joint_callback(self, msg):
 
         joint_map = dict(zip(msg.name, msg.position))
@@ -162,13 +144,9 @@ class SOAGradientAscent(Node):
                 for n in ACTIVE_JOINTS
             ])
 
-    ################################################
-
     def soa_callback(self, msg):
 
         self.soa = msg.data
-
-    ################################################
 
     def jacobian_callback(self, msg):
 
@@ -176,8 +154,6 @@ class SOAGradientAscent(Node):
 
         if data.shape[0] == len(ACTIVE_JOINTS):
             self.jsoa = data
-
-    ################################################
 
     def _check_physical_progress(self):
 
@@ -211,8 +187,6 @@ class SOAGradientAscent(Node):
                 f"the other way."
             )
 
-    ################################################
-
     def optimize(self):
 
         if self.finished or self.goal_active:
@@ -227,9 +201,7 @@ class SOAGradientAscent(Node):
             self.best_soa = self.soa
             self.best_q = self.q.copy()
 
-        ############################################
         # Stop conditions
-        ############################################
 
         if self.iteration >= self.max_iterations:
 
@@ -276,18 +248,6 @@ class SOAGradientAscent(Node):
         top_idx = np.arange(len(ACTIVE_JOINTS))
         weights = usable_grad_abs[top_idx] / max_grad
 
-        ############################################
-        # Convergence check (only meaningful in view --
-        # S is clamped to exactly 0 outside the FOV cone,
-        # so comparing it there always looks "converged")
-        ############################################
-
-        # NOTE: this must check *distance from zero*, not sign. S is
-        # clamped to exactly 0.0 outside the FOV cone (no info there --
-        # skip the comparison), but a genuinely negative in-view S is
-        # still a real reading and must NOT be treated the same as the
-        # clamp, or regression/flip detection below silently stops
-        # firing for any joint whose moves push S negative.
         in_view = abs(self.soa) > 1e-9
 
         if in_view and self.iteration > 0 and self.skip_next_convergence_check:
@@ -301,25 +261,12 @@ class SOAGradientAscent(Node):
 
             improvement = self.soa - self.last_soa
 
-            # Near the peak, noise/step-floor granularity makes S wobble
-            # by tiny amounts in either direction -- track how many
-            # consecutive ticks have been essentially flat, rather than
-            # requiring one single tick to land under the threshold
-            # (which can miss forever if it's always *just* above it).
             if abs(improvement) < self.improvement_tol:
                 self.stall_count += 1
             else:
                 self.stall_count = 0
 
             if improvement < -self.improvement_tol:
-
-                # Real regression (not just noise) -- the last accepted
-                # move made S worse. Two responses, both aimed at the
-                # joint that actually moved:
-                #  1) flip its empirical direction, in case the
-                #     analytic gradient's sign is simply wrong for it
-                #  2) shrink step, in case the sign was right and this
-                #     was a plain overshoot past the peak
                 if self.last_moved_joint is not None:
                     self.joint_flip[self.last_moved_joint] *= -1
                     self.get_logger().info(
@@ -338,11 +285,6 @@ class SOAGradientAscent(Node):
                     )
 
             elif improvement > self.improvement_tol:
-
-                # Genuinely climbing -- grow the step back up (capped at
-                # base_step) so an earlier shrink (possibly from noise)
-                # doesn't permanently cripple the pace for the rest of
-                # the run.
                 old_step = self.step
                 self.step = min(self.base_step, self.step * self.step_grow)
 
@@ -358,10 +300,8 @@ class SOAGradientAscent(Node):
                     f"Flat for {self.stall_count} ticks at floor step (S={self.soa:.4f})"
                 )
                 return
-
-        ############################################
+            
         # New joint target
-        ############################################
 
         slowdown_active = self.soa >= self.soa_slowdown_threshold
 
@@ -399,22 +339,13 @@ Target : {q_target}
 """
         )
 
-        ############################################
-        # Send trajectory (S is snapshotted now, only
-        # committed as "last_soa" if the goal is accepted)
-        ############################################
-
         self.pending_soa = self.soa
         self.pending_moved_joint = dominant_joint
         self.send_goal(q_target, slow=slowdown_active)
 
-    ################################################
-
     def _handle_stall(self, reason):
 
         if self.soa >= self.soa_acceptable:
-            # Shouldn't normally get here (the acceptable check runs
-            # earlier), but just in case: good enough, no need to kick.
             self.get_logger().info(f"{reason}; S already acceptable. Stopping.")
             self.finished = True
             return
@@ -422,11 +353,6 @@ Target : {q_target}
         if self.kick_count < self.max_kicks:
 
             self.kick_count += 1
-
-            # Judge the PREVIOUS kick (if any) by whether it found a
-            # new best S: accepted -> shrink (exploit nearby), rejected
-            # -> grow (search farther). First kick uses the starting
-            # kick_deg since there's nothing to judge yet.
             if self.pre_kick_best_soa is not None:
 
                 accepted = self.best_soa > self.pre_kick_best_soa + self.improvement_tol
@@ -458,31 +384,25 @@ Target : {q_target}
                 f"(±{self.kick_deg:.1f} deg, best S so far: {self.best_soa:.4f})."
             )
 
-            # Reset step/stall so ascent explores fully from the new
-            # spot instead of resuming with a tiny, already-shrunk step.
             self.step = self.base_step
             self.stall_count = 0
             self.skip_next_convergence_check = True
 
             self.pending_soa = self.soa
-            self.pending_moved_joint = None  # kick moves all joints, not one
+            self.pending_moved_joint = None 
             self.send_goal(q_kick)
             return
 
-        # Out of kicks -- fall back to the best pose seen, if it's not
-        # already where we are.
         self.get_logger().info(
             f"{reason}. Exhausted {self.max_kicks} kicks, best S found = "
             f"{self.best_soa:.4f}. Returning to that pose and stopping."
         )
 
         if self.best_q is not None and not np.allclose(self.best_q, self.q, atol=1e-4):
-            self.finished = True  # set now so goal_finished won't re-trigger optimize()
+            self.finished = True 
             self.send_goal(self.best_q)
         else:
             self.finished = True
-
-    ################################################
 
     def send_goal(self, q_active, slow=False):
 
@@ -546,8 +466,6 @@ Target : {q_target}
             self.goal_response_callback
         )
 
-    ################################################
-
     def goal_response_callback(self, future):
 
         goal_handle = future.result()
@@ -567,7 +485,6 @@ Target : {q_target}
 
             return
 
-        # Accepted -- commit the pre-move S and count this as a real iteration.
         self.rejections = 0
         self.last_soa = self.pending_soa
         self.last_moved_joint = self.pending_moved_joint
@@ -578,8 +495,6 @@ Target : {q_target}
         result_future.add_done_callback(
             self.goal_finished
         )
-
-    ################################################
 
     def goal_finished(self, future):
 
@@ -605,8 +520,6 @@ Target : {q_target}
        
         self._settle_timer.cancel()
         self.optimize()
-
-####################################################
 
 def main(args=None):
 

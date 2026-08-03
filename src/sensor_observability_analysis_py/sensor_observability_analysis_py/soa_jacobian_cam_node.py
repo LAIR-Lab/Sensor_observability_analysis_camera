@@ -1,7 +1,8 @@
 import numpy as np
 import roboticstoolbox as rtb
 from std_msgs.msg import Float64MultiArray, Float64
-
+from ament_index_python.packages import get_package_share_directory
+import os
 import rclpy
 from rclpy.node import Node
 
@@ -9,6 +10,11 @@ from sensor_msgs.msg import JointState
 
 from tf2_ros import Buffer, TransformListener, TransformException
 
+urdf_path = os.path.join(
+    get_package_share_directory("digital_twin"),
+    "urdf",
+    "so_finale.urdf.xacro"
+)
 
 JOINT_ORDER = [
     "joint_0",
@@ -26,9 +32,8 @@ class SOACameraJacobian(Node):
         super().__init__("soa_camera_jacobian")
 
         self.robot = rtb.ERobot.URDF(
-            "/home/arya-pangging/SOA/src/digital_twin/urdf/so_finale.urdf.xacro"
+            urdf_path
         )
-
 
         self.fov = 1.047
         self.q = None
@@ -155,21 +160,7 @@ class SOACameraJacobian(Node):
         # this equation is for linear function.
         S = 1.0 - theta / self.fov
 
-        #This is the gaussian funciton.
-        #S = np.exp(-(theta**2) / (2 * sigma**2))
-
-        # dtheta_dp / dtheta_dw both divide by sqrt(1 - c^2), which goes
-        # to zero at BOTH poles: c=+1 (theta=0, camera pointed exactly
-        # at the target) AND c=-1 (theta=180, pointed exactly AWAY from
-        # it). Near either pole this blows the derivative magnitude up
-        # arbitrarily -- since the controller picks the joint with the
-        # largest |J_SOA|, this made theta=180 look just as "attractive"
-        # as theta=0, purely from this numerical artifact.
         #
-        # S only depends on theta up to self.fov (~60deg) anyway, so
-        # exact derivative precision within a couple degrees of either
-        # pole isn't needed. Bound the value used in the denominator
-        # (NOT theta/S above, which stay exact) away from both poles.
         c_safe = np.clip(c, -0.9994, 0.9994)  # keeps ~2 deg clear of either pole
         denom = np.sqrt(max(1e-12, 1.0 - c_safe * c_safe))
 
