@@ -10,7 +10,6 @@ An open-source ROS 2 implementation of Sensor Observability Analysis for optimiz
 - TF-based camera tracking
 - Gradient ascent optimization
 - Gazebo simulation
-- ROS2 Jazzy support
 
 ## Requirements
 
