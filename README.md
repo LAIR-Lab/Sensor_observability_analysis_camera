@@ -24,9 +24,8 @@ visibility score — demonstrated on a SO-101 arm in Gazebo.
 ## Build
 
 ```bash
-cd ~/<ros2_ws>/src
-git clone <repo-url>
-cd ..
+cd ~/<ros2_ws>
+git clone https://github.com/LAIR-Lab/Sensor_observability_analysis_camera.git
 colcon build
 source install/setup.bash
 ```
