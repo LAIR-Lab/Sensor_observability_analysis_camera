@@ -22,7 +22,8 @@ An open-source ROS 2 implementation of Sensor Observability Analysis and demo fo
 Build the latest version via:
 ```bash
 
-cd ~/SOA
+cd ~/<ros2_ws>
+git clone 
 colcon build
 source install/setup.bash
 ```
