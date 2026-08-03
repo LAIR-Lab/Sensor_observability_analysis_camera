@@ -23,3 +23,7 @@ An open-source ROS 2 implementation of Sensor Observability Analysis for optimiz
 cd ~/SOA
 colcon build
 source install/setup.bash
+
+## W.I.P
+
+
