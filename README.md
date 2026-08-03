@@ -19,10 +19,11 @@ An open-source ROS 2 implementation of Sensor Observability Analysis for optimiz
 - Python 3.12
 
 ## Build
-
+Build the latest version via:
 ```bash
+
 cd ~/SOA
 colcon build
 source install/setup.bash
-
-
+```
+## Usage
