@@ -37,3 +37,6 @@ rosbag2_*/
 
 # Generated robot files
 *.sdf
+
+#Move folder in src is for real robot (W.I.P)
+src/move/
