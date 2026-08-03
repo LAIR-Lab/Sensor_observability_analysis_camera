@@ -1,3 +1,5 @@
+## Work in progress
+
 # Sensor_observability_analysis_camera
 An open-source ROS 2 implementation of Sensor Observability Analysis for optimizing robotic camera viewpoints through observability metrics and Jacobian-based motion planning.
 
@@ -23,7 +25,5 @@ An open-source ROS 2 implementation of Sensor Observability Analysis for optimiz
 cd ~/SOA
 colcon build
 source install/setup.bash
-
-## W.I.P
 
 
