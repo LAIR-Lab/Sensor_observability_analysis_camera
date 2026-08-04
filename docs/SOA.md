@@ -1,1 +1,3 @@
-## Describing SOA and implimenting SOA for bi-directional sensors/Camera.
+## Describing SOA and implimenting SOA for uni-directional sensors/Camera.
+
+## SOA
