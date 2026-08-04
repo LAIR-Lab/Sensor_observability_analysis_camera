@@ -4,7 +4,7 @@
   <name>sensor_observability_analysis_py</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="arya-pangging@todo.todo">arya-pangging</maintainer>
+  <maintainer email="panggingarya@gmail.com">arya-pangging</maintainer>
   <license>TODO: License declaration</license>
 
   <test_depend>ament_copyright</test_depend>
