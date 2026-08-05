@@ -11,6 +11,11 @@ T_{\text{uni}}(a,b)=
 $$
 
 $$
+\tilde{\mathbf{s}}^{i}=
+\max\left(
+0,\,
+T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})
+-
 \sum_i \lambda_i\,
 T_{\text{uni}}(\mathbf{p}_{\mathrm{poi}},\mathbf{p}_{\mathrm{obs}})
 \right)
