@@ -146,7 +146,3 @@ Constructs the observability matrix and evaluates the SOA index.
 | **Subscribes** | `/soa/index` |
 
 Prints the current SOA index to the ROS console.
-
-## License
-
-MIT License
