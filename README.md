@@ -52,6 +52,10 @@ independently.
    or the iteration limit is reached.
 
 ## Usage
+The simulation is divided into 2:
+One is with a static point of interest(POI) another is with a moving point of interest(POI)
+
+### For a static POI:
 
 Package: `sensor_observability_analysis_py`. Run in this order:
 
@@ -75,6 +79,29 @@ higher visibility.
 ros2 run sensor_observability_analysis_py soa_cam_move_node
 ```
 
+### For a moving POI
+
+Package: `sensor_observability_analysis_py`. Run in this order:
+
+**1. Launch the simulation** — spawns the SO-101 robot in Gazebo and RViz2, and
+initializes `ros2_control` plugins/controllers.
+
+```bash
+ros2 launch digital_twin gazebo.launch.py
+```
+
+**2. Start the Jacobian node** — computes SOA and its gradient for each joint.
+
+```bash
+ros2 run sensor_observability_analysis_py soa_camera_jacobian_node
+```
+
+**3. Start the motion node** — uses the SOA Jacobian to move the robot toward
+higher visibility.
+
+```bash
+ros2 run sensor_observability_analysis_py soa_cam_move_node
+```
 ## Nodes
 
 ### `soa_camera_jacobian_node`
