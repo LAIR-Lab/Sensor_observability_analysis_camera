@@ -87,20 +87,20 @@ Package: `sensor_observability_analysis_py`. Run in this order:
 initializes `ros2_control` plugins/controllers.
 
 ```bash
-ros2 launch digital_twin gazebo.launch.py
+ros2 launch digital_twin gazebo2.launch.py
 ```
 
 **2. Start the Jacobian node** — computes SOA and its gradient for each joint.
 
 ```bash
-ros2 run sensor_observability_analysis_py soa_camera_jacobian_node
+ros2 run sensor_observability_analysis_py soa_camera_obs_jacobian_node
 ```
 
 **3. Start the motion node** — uses the SOA Jacobian to move the robot toward
 higher visibility.
 
 ```bash
-ros2 run sensor_observability_analysis_py soa_cam_move_node
+ros2 run sensor_observability_analysis_py soa_cam_obs_move_node
 ```
 ## Nodes
 
