@@ -124,6 +124,7 @@ T_{\text{uni}}(\mathbf{p}_{\mathrm{poi}},\mathbf{p}_{\mathrm{obs}})
 \right)
 $$
 
+The practical formual removes the max function to deal with extreme cases when the angle is more than 60 /degrees
 
 `J_SOA` is the chain rule `dS/dxc @ Jc`, where `Jc` is the robot's Jacobian to
 `camera_3` and `dS/dxc` is the hand-derived gradient of `S` with respect to the
