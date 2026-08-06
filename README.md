@@ -113,6 +113,8 @@ s^{i}=
 \right)
 $$
 
+For Obstacles Occlusions:
+
 $$
 \tilde{\mathbf{s}}^{i}=
 \max\left(
