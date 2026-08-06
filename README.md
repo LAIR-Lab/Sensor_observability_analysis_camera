@@ -186,3 +186,10 @@ camera's position/orientation.
 | `max_kicks` | 50 | Random perturbations tried when stuck |
 | `kick_deg` | 5° (2°–20° range) | Size of each random kick |
 | `stall_patience` | 8 | Flat ticks before declaring a stall |
+
+
+# Bonus Primitive SOA (for Bi-directional sensors)
+
+This repo is also bundled with an implimentation of Force-Torque sensors which looksup for the observability metric from the "under arm" of the so=101 robot to the "upper_arm" link.
+
+See the [Camera SOA README](docs/SOA_ft_sensor.md).
