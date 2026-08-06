@@ -1,6 +1,6 @@
 # Sensor Observability Analysis — Camera (SOA)
 
-> **Status: work in progress**
+> **Status: Stable**
 
 An open-source ROS 2 implementation of **Sensor Observability Analysis (SOA)** for
 USB-camera viewpoints. Two nodes work together to move a camera-equipped robot arm
