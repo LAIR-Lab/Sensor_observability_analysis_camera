@@ -127,7 +127,7 @@ Though the theoretical formula for it is :
 $$
 T_{\text{uni}}(a,b)=
 \left(
-0,\frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
+\frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
 {\theta^{i}_{\mathrm{FOV}}}
 \right)
 $$
@@ -135,7 +135,7 @@ $$
 $$
 s^{i}=
 \left(
-0,\frac{\overline{\mathrm{FOV}}^{i}-\theta^{i}}
+\frac{\overline{\mathrm{FOV}}^{i}-\theta^{i}}
 {\overline{\mathrm{FOV}}^{i}}
 \right)
 $$
@@ -145,7 +145,6 @@ For Obstacles Occlusions:
 $$
 \tilde{\mathbf{s}}^{i}=
 \left(
-0,\,
 T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})
 \-
 \textstyle\sum_i \lambda_i
