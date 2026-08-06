@@ -94,6 +94,37 @@ ros2 run sensor_observability_analysis_py soa_cam_move_node
 S = 1 - θ / fov          (fov = 60°, not clamped — can go negative)
 ```
 
+Though the theoretical formula for it is :
+
+
+$$
+T_{\text{uni}}(a,b)=
+\max\left(
+0,\frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
+{\theta^{i}_{\mathrm{FOV}}}
+\right)
+$$
+
+$$
+s^{i}=
+\max\left(
+0,\frac{\overline{\mathrm{FOV}}^{i}-\theta^{i}}
+{\overline{\mathrm{FOV}}^{i}}
+\right)
+$$
+
+$$
+\tilde{\mathbf{s}}^{i}=
+\max\left(
+0,\,
+T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})
+\-
+\textstyle\sum_i \lambda_i
+T_{\text{uni}}(\mathbf{p}_{\mathrm{poi}},\mathbf{p}_{\mathrm{obs}})
+\right)
+$$
+
+
 `J_SOA` is the chain rule `dS/dxc @ Jc`, where `Jc` is the robot's Jacobian to
 `camera_3` and `dS/dxc` is the hand-derived gradient of `S` with respect to the
 camera's position/orientation.
