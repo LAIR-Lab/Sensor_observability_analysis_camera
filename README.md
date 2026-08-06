@@ -192,4 +192,4 @@ camera's position/orientation.
 
 This repo is also bundled with an implimentation of Force-Torque sensors which looksup for the observability metric from the "under arm" of the so=101 robot to the "upper_arm" link.
 
-See the [Camera SOA README](docs/SOA_ft_sensor.md).
+See the [SOA_FT README](docs/SOA_ft_sensor.md).
