@@ -111,9 +111,10 @@ ros2 run sensor_observability_analysis_py soa_visualizer
 
 Computes the sensor position
 
+
 $$
 \mathbf{r}
-=
+\=
 [x,y,z]^T
 $$
 
@@ -124,7 +125,7 @@ $$
 $$
 
 ---
-#Nodes
+
 ### `soa_solver`
 
 | | |
