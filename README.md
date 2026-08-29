@@ -213,6 +213,17 @@ camera's position/orientation.
 | `kick_deg` | 5° (2°–20° range) | Size of each random kick |
 | `stall_patience` | 8 | Flat ticks before declaring a stall |
 
+# Handling multiple Point of Interests(POI)
+Till now only single POI was being handles by a single uni-directional sensor. We extended the SOA's capability to include multiple cameras by modifying the equation as follows:
+
+$$
+S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)
+$$
+
+$$
+w_c = \frac{e^{-k S_c}}{\displaystyle\sum_{c'=1}^{N} e^{-k S_{c'}}}, \qquad
+J_{agg} = \sum_{c=1}^{N} w_c J_c
+$$
 
 # Bonus Primitive SOA (for Bi-directional sensors)
 
