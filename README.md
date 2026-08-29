@@ -217,7 +217,7 @@ camera's position/orientation.
 Till now only single POI was being handles by a single uni-directional sensor. We extended the SOA's capability to include multiple cameras by modifying the equation as follows:
 
 $$
-S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)
+\mathsbf{S_{agg}} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)
 $$
 
 $$
