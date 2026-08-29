@@ -228,7 +228,7 @@ $$
 $$\text{LSE}_{-k}(\mathbf{S})$$ \ $$\text{softmin}_k(\mathbf{S})$$ is used in SOA to include the weightage for all available sensors's SOA values, something which hardmax failed to achieve.
 The aggregate Jacobian calculates the best trajectory goals including multiple Jacobians from **N** different cameras mounted on the robot.
 
-Basically the weakest $$\text{SOA}_i$$ for a $$\text{camera}_i$$
+Basically the weakest $$\text{SOA}_i$$ for a $$\text{camera}_i$$ would have the highest influence on the trajectory of the robot.
 
 # Bonus Primitive SOA (for Bi-directional sensors)
 
