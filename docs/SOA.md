@@ -4,10 +4,10 @@
 
 $$
 T_{\text{uni}}(a,b)=
-\max\left(
-0,\frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
+
+\frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
 {\theta^{i}_{\mathrm{FOV}}}
-\right)
+
 $$
 
 $$
