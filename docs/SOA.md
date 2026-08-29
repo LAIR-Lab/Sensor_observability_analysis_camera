@@ -12,7 +12,7 @@ $$
 
 $$
 s^{i}=
-left(
+\left(
 0,\frac{\overline{\mathrm{FOV}}^{i}-\theta^{i}}
 {\overline{\mathrm{FOV}}^{i}}
 \right)
@@ -20,7 +20,7 @@ $$
 
 $$
 \tilde{\mathbf{s}}^{i}=
-left(
+\left(
 0,\,
 T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})
 \-
