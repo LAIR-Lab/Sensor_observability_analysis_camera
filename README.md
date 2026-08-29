@@ -223,12 +223,11 @@ S^{i} = T_{\text{uni}}(\hat{\mathbf{s_{i}}},\mathbf{p^{i}}_{\mathrm{poi}})=
 {\theta^{i}_{\mathrm{FOV}}}
 \right) \qquad
 
-\mathbf{S} = [S_1,\ S_2,\ S_3,\ \dots,\ S_N]
 
 $$
 
 $$
-S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)  \qquad
+S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right), \qquad
 k = 20
 $$
 
