@@ -1,6 +1,6 @@
 # Sensor Observability Analysis — Camera (SOA)
 
-> **Status: work in progress**
+> **Status: Stable**
 
 An open-source ROS 2 implementation of **Sensor Observability Analysis (SOA)** for
 USB-camera viewpoints. Two nodes work together to move a camera-equipped robot arm
@@ -52,6 +52,10 @@ independently.
    or the iteration limit is reached.
 
 ## Usage
+The simulation is divided into 2:
+One is with a static point of interest(POI) another is with a moving point of interest(POI)
+
+### For a static POI:
 
 Package: `sensor_observability_analysis_py`. Run in this order:
 
@@ -75,6 +79,29 @@ higher visibility.
 ros2 run sensor_observability_analysis_py soa_cam_move_node
 ```
 
+### For a moving POI
+
+Package: `sensor_observability_analysis_py`. Run in this order:
+
+**1. Launch the simulation** — spawns the SO-101 robot in Gazebo and RViz2, and
+initializes `ros2_control` plugins/controllers.
+
+```bash
+ros2 launch digital_twin gazebo2.launch.py
+```
+
+**2. Start the Jacobian node** — computes SOA and its gradient for each joint.
+
+```bash
+ros2 run sensor_observability_analysis_py soa_camera_obs_jacobian_node
+```
+
+**3. Start the motion node** — uses the SOA Jacobian to move the robot toward
+higher visibility.
+
+```bash
+ros2 run sensor_observability_analysis_py soa_cam_obs_move_node
+```
 ## Nodes
 
 ### `soa_camera_jacobian_node`
@@ -93,6 +120,39 @@ ros2 run sensor_observability_analysis_py soa_cam_move_node
 θ = angle between camera axis and direction to POI
 S = 1 - θ / fov          (fov = 60°, not clamped — can go negative)
 ```
+
+Though the theoretical formula for it is :
+
+
+$$
+T_{\text{uni}}(a,b)=
+\left(
+\frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
+{\theta^{i}_{\mathrm{FOV}}}
+\right)
+$$
+
+$$
+s^{i}=
+\left(
+\frac{\overline{\mathrm{FOV}}^{i}-\theta^{i}}
+{\overline{\mathrm{FOV}}^{i}}
+\right)
+$$
+
+For Obstacles Occlusions:
+
+$$
+\tilde{\mathbf{s}}^{i}=
+\left(
+T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})
+\-
+\textstyle\sum_i \lambda_i
+T_{\text{uni}}(\mathbf{p}_{\mathrm{poi}},\mathbf{p}_{\mathrm{obs}})
+\right)
+$$
+
+The practical formual removes the max function to deal with extreme cases when the angle is more than 60 /degrees
 
 `J_SOA` is the chain rule `dS/dxc @ Jc`, where `Jc` is the robot's Jacobian to
 `camera_3` and `dS/dxc` is the hand-derived gradient of `S` with respect to the
@@ -152,3 +212,10 @@ camera's position/orientation.
 | `max_kicks` | 50 | Random perturbations tried when stuck |
 | `kick_deg` | 5° (2°–20° range) | Size of each random kick |
 | `stall_patience` | 8 | Flat ticks before declaring a stall |
+
+
+# Bonus Primitive SOA (for Bi-directional sensors)
+
+This repo is also bundled with an implimentation of Force-Torque sensors which looksup for the observability metric from the "under arm" of the so=101 robot to the "upper_arm" link.
+
+See the [SOA_FT README](docs/SOA_ft_sensor.md).
