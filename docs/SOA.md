@@ -4,10 +4,10 @@
 
 $$
 T_{\text{uni}}(a,b)=
-
+\left(
 \frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
 {\theta^{i}_{\mathrm{FOV}}}
-
+\right)
 $$
 
 $$
