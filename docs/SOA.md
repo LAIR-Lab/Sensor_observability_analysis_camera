@@ -21,7 +21,7 @@ $$
 $$
 \tilde{\mathbf{s}}^{i}=
 \left(
-0,\,
+0,
 T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})
 \-
 \textstyle\sum_i \lambda_i
