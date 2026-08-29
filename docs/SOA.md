@@ -3,7 +3,7 @@
 ## SOA
 
 $$
-T_{\text{uni}}(a,b)=
+T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})=
 \left(
 \frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
 {\theta^{i}_{\mathrm{FOV}}}
