@@ -50,13 +50,19 @@ setup(
 
             'soa_camera_obs_jacobian_node = sensor_observability_analysis_py.soa_jacobian_cam_obs_node:main',
 
+            'soa_camera_general_jacobian_node = sensor_observability_analysis_py.soa_jacobian_cam_general:main',
+
             'log_test_node = sensor_observability_analysis_py.log_test:main',
 
             'soa_cam_move_node = sensor_observability_analysis_py.soa_cam_move:main',
 
+            'soa_cam_move_node_2 = sensor_observability_analysis_py.soa_cam_move_2:main',
+
             'soa_cam_obs_move_node = sensor_observability_analysis_py.soa_cam_obs_move:main',
 
             'soa_cam_moving_node = sensor_observability_analysis_py.soa_cam_moving:main',
+
+            
 
         ],
     },

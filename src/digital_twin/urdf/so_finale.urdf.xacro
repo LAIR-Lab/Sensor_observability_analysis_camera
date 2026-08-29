@@ -620,7 +620,6 @@
     </sensor>
   </gazebo>
 
-
   <gazebo reference="camera_2">
     <sensor name="cube_camera_two" type="camera">
       <update_rate>10</update_rate>
@@ -643,7 +642,6 @@
       </camera>
     </sensor>
   </gazebo>
-
 
   <gazebo reference="camera_3">
     <sensor name="cube_camera_three" type="camera">

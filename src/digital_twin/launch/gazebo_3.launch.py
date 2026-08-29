@@ -28,9 +28,7 @@ def launch_setup(context, *args, **kwargs):
         LogInfo(msg=f"[Launch] Using simulation time: {use_sim_time}"),
     ]
 
-
 def generate_launch_description():
-    """Generate launch description for ROS2 Jazzy with Gazebo Harmonic simulator"""
     
     digital_twin_dir = get_package_share_directory("digital_twin")
     ros_gz_sim_dir = get_package_share_directory("ros_gz_sim")

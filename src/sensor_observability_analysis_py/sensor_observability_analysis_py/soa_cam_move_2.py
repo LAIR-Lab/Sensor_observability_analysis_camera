@@ -12,13 +12,15 @@ from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
 
-# Joints RTB's chain to camera_3 actually uses (affects J_SOA / q length).
+# Full joint set now that the jacobian node pads Jsoa/Jsoa_2 out to the
+# robot's full q-length (see soa_jacobian_cam_general.py: pad_to_full).
 ACTIVE_JOINTS = [
     "joint_0",
     "joint_1",
     "joint_2",
     "joint_3",
-    "joint_4"
+    "joint_4",
+    "joint_5"
 ]
 
 CONTROLLER_JOINTS = [
@@ -30,9 +32,12 @@ CONTROLLER_JOINTS = [
     "joint_5"
 ]
 
+# TODO: fill in joint_5's real URDF limits before running. Left as None
+# on purpose -- guessing a physical joint limit is unsafe. The startup
+# assertion below stops the node from running with a fabricated value.
 
-JOINT_LOWER_LIMITS = np.array([-2.243, -1.418, -1.927, -1.168, -2.0])
-JOINT_UPPER_LIMITS = np.array([1.827, 2.08, 1.147, 2.0, 2.4])
+JOINT_LOWER_LIMITS = np.array([-2.243, -1.418, -1.927, -1.168, -2.0, -0.178])
+JOINT_UPPER_LIMITS = np.array([1.827, 2.08, 1.147, 2.0, 2.4, 1.555])
 JOINT_LIMIT_MARGIN = np.deg2rad(1.0)
 PHYSICAL_BLOCK_FRACTION = 0.5
 PHYSICAL_BLOCK_MIN_DELTA = np.deg2rad(0.5)
@@ -56,7 +61,7 @@ class SOAGradientAscent(Node):
         self.stall_patience = 8
         self.stall_count = 0
 
-        self.soa_acceptable = 0.95
+        self.soa_acceptable = 1.0
 
         self.soa_slowdown_threshold = 0.85
         self.soa_slowdown_step_factor = 0.4
@@ -75,8 +80,9 @@ class SOAGradientAscent(Node):
         self.kick_count = 0
         self.pre_kick_best_soa = None
         self.q = None
-        self.soa = None
-        self.jsoa = None
+        self.soa = None       # Gamma_min blended score (from /soa/value)
+        self.jsoa = None      # Gamma_min blended gradient (from /soa/jacobian)
+        self.true_min = None  # true unblended min(S_camera3, S_camera2), for stop gating
 
         self.full_positions = {}
 
@@ -120,6 +126,13 @@ class SOAGradientAscent(Node):
             1
         )
 
+        self.create_subscription(
+            Float64,
+            "/soa/value_2",
+            self.true_min_callback,
+            1
+        )
+
         self.client = ActionClient(
             self,
             FollowJointTrajectory,
@@ -154,6 +167,16 @@ class SOAGradientAscent(Node):
 
         if data.shape[0] == len(ACTIVE_JOINTS):
             self.jsoa = data
+
+    def true_min_callback(self, msg):
+
+        # /soa/value_2 now carries min(S_camera3, S_camera2) -- the true,
+        # unblended worst-camera score -- published by the jacobian node
+        # alongside the Gamma_min blend on /soa/value. See jacobian node
+        # for why: Gamma_min is always <= true min, so stop conditions
+        # should check this, not self.soa -- "done" means BOTH cameras
+        # are acceptable, i.e. the worse one clears the threshold.
+        self.true_min = msg.data
 
     def _check_physical_progress(self):
 
@@ -209,10 +232,16 @@ class SOAGradientAscent(Node):
             self.finished = True
             return
 
-        if self.soa >= self.soa_acceptable:
+        # Gate "are we done" on the true unblended min, not the Gamma_min
+        # blend in self.soa -- the blend is always <= true min, so checking
+        # self.soa here could let it stall early on a pose where the worse
+        # camera hasn't actually reached soa_acceptable yet.
+        gate_score = self.true_min if self.true_min is not None else self.soa
+
+        if gate_score >= self.soa_acceptable:
 
             self.get_logger().info(
-                f"SOA acceptable (S={self.soa:.4f} >= {self.soa_acceptable}). Stopping."
+                f"SOA acceptable (true min S={gate_score:.4f} >= {self.soa_acceptable}). Stopping."
             )
             self.finished = True
             return
@@ -328,7 +357,7 @@ class SOAGradientAscent(Node):
             f"""
 ====================================
 Iteration : {self.iteration}
-SOA : {self.soa:.4f}
+SOA (Gamma_min blend) : {self.soa:.4f}   True min : {self.true_min}
 Step : {np.rad2deg(effective_step):.2f} deg{' (slowdown active, S >= ' + str(self.soa_slowdown_threshold) + ')' if slowdown_active else ''}
 Dominant joint : {ACTIVE_JOINTS[dominant_joint]}
 Moved joints : {[ACTIVE_JOINTS[j] for j in top_idx]}
@@ -344,7 +373,9 @@ Target : {q_target}
 
     def _handle_stall(self, reason):
 
-        if self.soa >= self.soa_acceptable:
+        gate_score = self.true_min if self.true_min is not None else self.soa
+
+        if gate_score >= self.soa_acceptable:
             self.get_logger().info(f"{reason}; S already acceptable. Stopping.")
             self.finished = True
             return

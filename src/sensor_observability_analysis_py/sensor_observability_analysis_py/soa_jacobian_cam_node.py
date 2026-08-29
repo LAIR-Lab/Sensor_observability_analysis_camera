@@ -174,7 +174,6 @@ class SOACameraJacobian(Node):
 
         dS_dp = -dtheta_dp / self.fov
 
-
         dtheta_dw = (
             rhat @ self.skew(a)
         ) / denom
@@ -243,7 +242,6 @@ class SOACameraJacobian(Node):
         msg3 = Float64()
         msg3.data = result["angle"]
         self.theta_pub.publish(msg3)
-
         self.get_logger().info(
             "\n"
             "====================================\n"

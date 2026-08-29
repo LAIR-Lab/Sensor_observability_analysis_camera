@@ -6,7 +6,6 @@
   <xacro:property name="sphere_z" value="${0.2}"/>
   <xacro:property name="orbit_radius" value="${sqrt(sphere_x*sphere_x + sphere_z*sphere_z)}"/>
   
-
   <link name="red_sphere">
     <inertial>
       <mass value="0.0001"/>
