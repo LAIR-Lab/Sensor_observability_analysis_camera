@@ -225,7 +225,7 @@ S = T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})=
 $$
 
 $$
-S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)   k = 20
+S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)  \: k = 20
 $$
 
 $$
