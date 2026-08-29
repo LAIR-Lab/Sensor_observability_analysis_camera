@@ -217,6 +217,14 @@ camera's position/orientation.
 Till now only single POI was being handles by a single uni-directional sensor. We extended the SOA's capability to include multiple cameras by modifying the equation as follows:
 
 $$
+T_{\text{uni}}(\hat{\mathbf{s}},\mathbf{p}_{\mathrm{poi}})=
+\left(
+\frac{\theta^{i}_{\mathrm{FOV}}-\theta^{i}}
+{\theta^{i}_{\mathrm{FOV}}}
+\right)
+$$
+
+$$
 S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)
 $$
 
