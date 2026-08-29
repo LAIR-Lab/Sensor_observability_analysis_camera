@@ -225,6 +225,11 @@ w_c = \frac{e^{-k S_c}}{\displaystyle\sum_{c'=1}^{N} e^{-k S_{c'}}}, \qquad
 J_{agg} = \sum_{c=1}^{N} w_c J_c
 $$
 
+$$\text{softmin}_k(\mathbf{S})$$ is used in SOA to include the weightage for all available sensors's SOA values, something which hardmax failed to achieve.
+The aggregate Jacobian calculates the best trajectory goals including multiple Jacobians from $$ **N** $$ different cameras mounted on the robot.
+
+Basically the weakest
+
 # Bonus Primitive SOA (for Bi-directional sensors)
 
 This repo is also bundled with an implimentation of Force-Torque sensors which looksup for the observability metric from the "under arm" of the so=101 robot to the "upper_arm" link.
