@@ -11,9 +11,6 @@ from rclpy.action import ActionClient
 from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
-
-# Full joint set now that the jacobian node pads Jsoa/Jsoa_2 out to the
-# robot's full q-length (see soa_jacobian_cam_general.py: pad_to_full).
 ACTIVE_JOINTS = [
     "joint_0",
     "joint_1",
@@ -31,10 +28,6 @@ CONTROLLER_JOINTS = [
     "joint_4",
     "joint_5"
 ]
-
-# TODO: fill in joint_5's real URDF limits before running. Left as None
-# on purpose -- guessing a physical joint limit is unsafe. The startup
-# assertion below stops the node from running with a fabricated value.
 
 JOINT_LOWER_LIMITS = np.array([-2.243, -1.418, -1.927, -1.168, -2.0, -0.178])
 JOINT_UPPER_LIMITS = np.array([1.827, 2.08, 1.147, 2.0, 2.4, 1.555])
@@ -80,9 +73,9 @@ class SOAGradientAscent(Node):
         self.kick_count = 0
         self.pre_kick_best_soa = None
         self.q = None
-        self.soa = None       # Gamma_min blended score (from /soa/value)
-        self.jsoa = None      # Gamma_min blended gradient (from /soa/jacobian)
-        self.true_min = None  # true unblended min(S_camera3, S_camera2), for stop gating
+        self.soa = None      
+        self.jsoa = None      
+        self.true_min = None  
 
         self.full_positions = {}
 
@@ -169,13 +162,6 @@ class SOAGradientAscent(Node):
             self.jsoa = data
 
     def true_min_callback(self, msg):
-
-        # /soa/value_2 now carries min(S_camera3, S_camera2) -- the true,
-        # unblended worst-camera score -- published by the jacobian node
-        # alongside the Gamma_min blend on /soa/value. See jacobian node
-        # for why: Gamma_min is always <= true min, so stop conditions
-        # should check this, not self.soa -- "done" means BOTH cameras
-        # are acceptable, i.e. the worse one clears the threshold.
         self.true_min = msg.data
 
     def _check_physical_progress(self):
@@ -231,11 +217,7 @@ class SOAGradientAscent(Node):
             self.get_logger().info("Maximum iterations reached.")
             self.finished = True
             return
-
-        # Gate "are we done" on the true unblended min, not the Gamma_min
-        # blend in self.soa -- the blend is always <= true min, so checking
-        # self.soa here could let it stall early on a pose where the worse
-        # camera hasn't actually reached soa_acceptable yet.
+        
         gate_score = self.true_min if self.true_min is not None else self.soa
 
         if gate_score >= self.soa_acceptable:

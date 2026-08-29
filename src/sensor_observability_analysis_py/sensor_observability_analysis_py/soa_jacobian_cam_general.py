@@ -24,17 +24,7 @@ JOINT_ORDER = [
     "joint_4",
     "joint_5"
 ]
-
-# Sharpness of the smooth-min (Gamma_min^k) blend across the two cameras.
-# With only 2 cameras, gaps of ~0.1-0.9 in S occur -- k=20 keeps the
-# gradient smooth right at a crossover while staying close to true
-# hard-min elsewhere (see MATH.md for the derivation).
 SOFTMAX_K = 20.0
-
-# Smooth-max operator (log-sum-exp) and its exact gradient weights
-# (soft-argmax). See MATH.md: Gamma_max^k(S) >= max(S) always, and
-# grad Gamma_max^k = sum_c w_c * J_c with w_c = gamma_argmax_weights(S)[c] --
-# no leftover covariance term, unlike a naive softmax-weighted average.
 
 def gamma_max(S, k):
 
@@ -52,13 +42,6 @@ def gamma_argmax_weights(S, k):
     e = np.exp(k * (S - m))
 
     return e / e.sum()
-
-
-# Smooth-min operator, via the identity Gamma_min^k(S) = -Gamma_max^k(-S).
-# Unlike Gamma_max^k (which lets a weak camera be ignored), this
-# concentrates the gradient on whichever camera is currently WORSE, so
-# both cameras get pushed toward acceptable visibility instead of one
-# being abandoned once it falls far enough behind. See MATH.md.
 
 def gamma_min(S, k):
 
@@ -139,15 +122,7 @@ class SOACameraJacobian(Node):
             self.update
         )
 
-    # Utility
-
     def _log_joint_structure(self):
-
-        # One-time startup diagnostic: confirms whether jindex order
-        # actually matches JOINT_ORDER. If jindex 0 isn't "joint_0"'s
-        # link, joint_indices_for_end's assumption is wrong and the
-        # padding will scatter gradients into the wrong slots.
-
         lines = ["Robot link/joint structure (link_name, isjoint, jindex, parent):"]
 
         for link in self.robot.links:
@@ -185,21 +160,6 @@ class SOACameraJacobian(Node):
         ])
 
     def joint_indices_for_end(self, end):
-
-        # Walk from `end` back to the base, collecting the jindex
-        # (position in the robot's own q vector) of every actuated
-        # joint on the path. jacob0(q, end=end) returns one column per
-        # joint on this same path, in the same base->end order, so
-        # jindex tells us which slot in the full 6-vector each column
-        # of that partial Jacobian belongs to.
-        #
-        # NOTE: link.name is the URDF *link* name, not the joint name
-        # ("joint_0" etc.) -- do not filter on link.name, it won't
-        # match JOINT_ORDER. jindex is assigned by rtb in URDF
-        # declaration order, which we're assuming matches JOINT_ORDER
-        # (confirmed via the startup diagnostic below -- check the log
-        # if this assumption is ever wrong).
-
         idxs = []
         link = self.robot.link_dict[end]
 
@@ -221,14 +181,6 @@ class SOACameraJacobian(Node):
         return idxs
 
     def pad_to_full(self, Jsoa_partial, joint_indices):
-
-        # Cameras on different branches of the kinematic tree see
-        # different numbers of upstream joints, so jacob0() returns
-        # narrower Jacobians for cameras closer to the base. This
-        # scatters each partial gradient entry back to its correct
-        # joint slot in the full JOINT_ORDER vector, zero elsewhere --
-        # zero is the mathematically correct value for a joint that
-        # genuinely doesn't move that camera at all.
 
         full = np.zeros(len(JOINT_ORDER))
         full[joint_indices] = Jsoa_partial
@@ -387,10 +339,6 @@ class SOACameraJacobian(Node):
 
         Jsoa_2 = dS_dxc_2 @ Jc_2
 
-        # Cameras sit on different branches, so Jc/Jc_2 can have
-        # different numbers of columns -- pad both back to the full
-        # joint vector so downstream code (aggregation, np.stack) can
-        # always assume a fixed length.
         Jsoa = self.pad_to_full(
             Jsoa,
             self.joint_indices_for_end("camera_3")
@@ -485,11 +433,7 @@ class SOACameraJacobian(Node):
         weights = gamma_argmin_weights(S_arr, SOFTMAX_K)
         Jsoa_agg = weights @ J_stack
 
-        # True min, for stop-condition gating downstream -- S_agg is always
-        # <= true_min (log-sum-exp is deflated by the blend for Gamma_min),
-        # and "done" should mean BOTH cameras are acceptable, i.e. the
-        # WORSE camera's score clears the threshold -- so gate on true_min,
-        # not S_agg.
+       
         true_min = S_arr.min()
 
         msg = Float64MultiArray()
@@ -499,15 +443,10 @@ class SOACameraJacobian(Node):
         msg2 = Float64()
         msg2.data = S_agg
         self.soa_pub.publish(msg2)
-
-        # camera_3 raw angle, unchanged for backward compat
         msg3 = Float64()
         msg3.data = result["angle"]
         self.theta_pub.publish(msg3)
 
-        # camera_2 raw (padded) Jsoa_2 and angle -- debug-only, not used
-        # by the controller, but useful for exactly this kind of
-        # per-camera inspection
         msg_j2 = Float64MultiArray()
         msg_j2.data = result["Jsoa_2"].tolist()
         self.jsoa_pub_2.publish(msg_j2)
