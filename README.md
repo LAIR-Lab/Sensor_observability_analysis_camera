@@ -225,7 +225,7 @@ S^{i} = T_{\text{uni}}(\hat{\mathbf{s_{i}}},\mathbf{p^{i}}_{\mathrm{poi}})=
 $$
 
 $$
-\mathbf{S} = [S_1,\ S_2,\ S_3,\ \dots,\ S_N]
+\mathbf{S} = [S_1,\ S_2,\ S_3,\ \dots,\ S_N]^{T}
 $$
 
 $$
