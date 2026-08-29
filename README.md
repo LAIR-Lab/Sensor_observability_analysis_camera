@@ -217,13 +217,14 @@ camera's position/orientation.
 Till now only single POI was being handles by a single uni-directional sensor. We extended the SOA's capability to include multiple cameras by modifying the equation as follows:
 
 $$
-\mathbf{S_{agg}} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)
+S_{agg} = \Gamma_{\min}^{k}(\mathbf{S}) = -\frac{1}{k} \ln \left( \sum_{c=1}^{N} e^{-k S_c} \right)
 $$
 
 $$
 w_c = \frac{e^{-k S_c}}{\displaystyle\sum_{c'=1}^{N} e^{-k S_{c'}}}, \qquad
 J_{agg} = \sum_{c=1}^{N} w_c J_c
 $$
+
 $$\text{softmin}_k(\mathbf{S}) \;/\; \text{LSE}_{-k}(\mathbf{S})$$ is used in SOA to include the weightage for all available sensors's SOA values, something which hardmax failed to achieve.
 The aggregate Jacobian calculates the best trajectory goals including multiple Jacobians from $$ **N** $$ different cameras mounted on the robot.
 
